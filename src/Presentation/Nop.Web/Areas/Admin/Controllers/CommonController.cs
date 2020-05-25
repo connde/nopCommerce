@@ -350,20 +350,12 @@ namespace Nop.Web.Areas.Admin.Controllers
         public virtual IActionResult RestartApplication(string returnUrl = "")
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
+                return BadRequest();
 
             //restart application
             _webHelper.RestartAppDomain();
 
-            //home page
-            if (string.IsNullOrEmpty(returnUrl))
-                return RedirectToAction("Index", "Home", new { area = AreaNames.Admin });
-
-            //prevent open redirection attack
-            if (!Url.IsLocalUrl(returnUrl))
-                return RedirectToAction("Index", "Home", new { area = AreaNames.Admin });
-
-            return Redirect(returnUrl);
+            return Ok();
         }
 
         public virtual IActionResult SeNames()
