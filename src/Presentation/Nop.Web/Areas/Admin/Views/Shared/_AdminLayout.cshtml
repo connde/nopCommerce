@@ -245,38 +245,27 @@
                                                 </form>
                                             </li>
                                             <li>
-                                                @*<form asp-controller="Common" asp-action="RestartApplication" asp-area="@AreaNames.Admin">
-                                                </form>*@
-                                                    <input name="returnurl" type="hidden" value="@returnUrl">
-                                                    <button id="restart-application" type="submit" class="bg-dark">
-                                                        <span>@T("Admin.Header.RestartApplication")</span>
-                                                    </button>
-                                                    <script>
-                                                        $(document).ready(function () {
-                                                            $("#restart-application").click(function (e) {
-                                                                //showThrobber('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Header.RestartApplication.Progress").Text))');
-
-                                                                var postData = {};
-                                                                addAntiForgeryToken(postData);
-
-                                                                $.ajax({
-                                                                    cache: false,
-                                                                    type: "POST",
-                                                                    data: postData,
-                                                                    url: "@(Url.Action("RestartApplication", "Common"))",
-                                                                    beforeSend: function () {
-                                                                        $(".throbber").show();
-                                                                    },
-                                                                    error: function (jqXHR, textStatus, errorThrown) {
-                                                                        console.log('error');
-                                                                    },
-                                                                    complete: function () {
-                                                                        $(".throbber").hide();
+                                                <button id="restart-application" type="submit" class="bg-dark">
+                                                    <span>@T("Admin.Header.RestartApplication")</span>
+                                                </button>
+                                                <script>
+                                                    $(document).ready(function () {
+                                                        $("#restart-application").click(function (e) {
+                                                            showThrobber('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Header.RestartApplication.Progress").Text))');
+                                                            $.ajax({
+                                                                type: "GET",
+                                                                url: "@(Url.Action("RestartApplication", "Common", new { returnUrl }))",
+                                                                success: function (data) {
+                                                                    if (data.url) {
+                                                                        window.setTimeout(function () {
+                                                                            window.location.href = data.url;
+                                                                        }, 5000);
                                                                     }
-                                                                });
+                                                                }
                                                             });
                                                         });
-                                                    </script>
+                                                    });
+                                                </script>
                                             </li>
                                         </ul>
                                     </li>

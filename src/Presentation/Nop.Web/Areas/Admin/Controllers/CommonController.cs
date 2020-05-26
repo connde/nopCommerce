@@ -346,16 +346,23 @@ namespace Nop.Web.Areas.Admin.Controllers
             return Redirect(returnUrl);
         }
 
-        [HttpPost]
         public virtual IActionResult RestartApplication(string returnUrl = "")
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return BadRequest();
+                return AccessDeniedView();
 
             //restart application
             _webHelper.RestartAppDomain();
 
-            return Ok();
+            //home page
+            if (string.IsNullOrEmpty(returnUrl))
+                return Json(new { url = Url.Action("Index", "Home", new { area = AreaNames.Admin }) });
+
+            //prevent open redirection attack
+            if (!Url.IsLocalUrl(returnUrl))
+                return Json(new { url = Url.Action("Index", "Home", new { area = AreaNames.Admin }) });
+
+            return Json(new { url = returnUrl });
         }
 
         public virtual IActionResult SeNames()
