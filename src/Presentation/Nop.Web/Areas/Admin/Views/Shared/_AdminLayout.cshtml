@@ -245,7 +245,7 @@
                                                 </form>
                                             </li>
                                             <li>
-                                                <button id="restart-application" type="submit" class="bg-dark">
+                                                <button id="restart-application" type="button" class="bg-dark">
                                                     <span>@T("Admin.Header.RestartApplication")</span>
                                                 </button>
                                                 <script>
@@ -254,12 +254,12 @@
                                                             showThrobber('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Header.RestartApplication.Progress").Text))');
                                                             $.ajax({
                                                                 type: "GET",
-                                                                url: "@(Url.Action("RestartApplication", "Common", new { returnUrl }))",
+                                                                url: "@Url.Action("RestartApplication", "Common", new { returnUrl })",
                                                                 success: function (data) {
                                                                     if (data.url) {
                                                                         window.setTimeout(function () {
                                                                             window.location.href = data.url;
-                                                                        }, 5000);
+                                                                        }, @commonSettings.RestartTimeout);
                                                                     }
                                                                 }
                                                             });

@@ -158,10 +158,7 @@ namespace Nop.Web.Areas.Admin.Controllers
             try
             {
                 if (archivefile == null || archivefile.Length == 0)
-                {
-                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.Common.UploadFile"));
-                    return RedirectToAction("List");
-                }
+                    throw new NopException(_localizationService.GetResource("Admin.Common.UploadFile"));
 
                 var descriptors = _uploadService.UploadPluginsAndThemes(archivefile);
                 var pluginDescriptors = descriptors.OfType<PluginDescriptor>().ToList();
@@ -191,7 +188,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                 _notificationService.SuccessNotification(message);
 
                 //restart application
-                _webHelper.RestartAppDomain();
+                _webHelper.RestartApplication();
             }
             catch (Exception exc)
             {
@@ -306,27 +303,18 @@ namespace Nop.Web.Areas.Admin.Controllers
             return RedirectToAction("List");
         }
 
-        [HttpPost, ActionName("List")]
-        [FormValueRequired("plugin-reload-grid")]
         public virtual IActionResult ReloadList()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManagePlugins))
-                return AccessDeniedView();
+                return Json(new { url = Url.Action("AccessDenied", "Security", new { pageUrl = _webHelper.GetRawUrl(Request) }) });
 
             _pluginService.UninstallPlugins();
             _pluginService.DeletePlugins();
 
             //restart application
-            _webHelper.RestartAppDomain();
+            _webHelper.RestartApplication();
 
-            return RedirectToAction("List");
-        }
-
-        [HttpPost, ActionName("List")]
-        [FormValueRequired("plugin-apply-changes")]
-        public virtual IActionResult ApplyChanges()
-        {
-            return ReloadList();
+            return Json(new { url = Url.Action("List", "Plugin") });
         }
 
         [HttpPost, ActionName("List")]

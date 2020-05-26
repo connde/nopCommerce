@@ -392,9 +392,9 @@ namespace Nop.Core
         }
 
         /// <summary>
-        /// Restart application domain
+        /// Restart application
         /// </summary>
-        public virtual void RestartAppDomain()
+        public virtual void RestartApplication()
         {
             _hostApplicationLifetime.StopApplication();
         }

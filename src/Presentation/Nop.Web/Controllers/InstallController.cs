@@ -60,11 +60,12 @@ namespace Nop.Web.Controllers
                 ConnectionStringRaw = false,
                 DataProvider = DataProviderType.SqlServer
             };
-            
+
             model.AvailableDataProviders.AddRange(
                 _locService.GetAvailableProviderTypes()
                 .OrderBy(v => v.Value)
-                .Select(pt => new SelectListItem { 
+                .Select(pt => new SelectListItem
+                {
                     Value = pt.Key.ToString(),
                     Text = pt.Value
                 }));
@@ -103,7 +104,8 @@ namespace Nop.Web.Controllers
             model.AvailableDataProviders.AddRange(
                 _locService.GetAvailableProviderTypes()
                     .OrderBy(v => v.Value)
-                    .Select(pt => new SelectListItem { 
+                    .Select(pt => new SelectListItem
+                    {
                         Value = pt.Key.ToString(),
                         Text = pt.Value
                     }));
@@ -220,7 +222,7 @@ namespace Nop.Web.Controllers
                 catch { }
 
                 //restart application
-                webHelper.RestartAppDomain();
+                webHelper.RestartApplication();
 
                 //Redirect to home page
                 return RedirectToRoute("Homepage");
@@ -254,19 +256,15 @@ namespace Nop.Web.Controllers
             return RedirectToAction("Index", "Install");
         }
 
-        [HttpPost]
-        [IgnoreAntiforgeryToken]
         public virtual IActionResult RestartInstall()
         {
             if (DataSettingsManager.DatabaseIsInstalled)
-                return RedirectToRoute("Homepage");
+                return Json(new { url = Url.RouteUrl("Homepage") });
 
             //restart application
-            var webHelper = EngineContext.Current.Resolve<IWebHelper>();
-            webHelper.RestartAppDomain();
+            EngineContext.Current.Resolve<IWebHelper>().RestartApplication();
 
-            //Redirect to home page
-            return RedirectToRoute("Homepage");
+            return Json(new { url = Url.Action("Index", "Install") });
         }
 
         #endregion

@@ -349,10 +349,10 @@ namespace Nop.Web.Areas.Admin.Controllers
         public virtual IActionResult RestartApplication(string returnUrl = "")
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageMaintenance))
-                return AccessDeniedView();
+                return Json(new { url = Url.Action("AccessDenied", "Security", new { pageUrl = _webHelper.GetRawUrl(Request) }) });
 
             //restart application
-            _webHelper.RestartAppDomain();
+            _webHelper.RestartApplication();
 
             //home page
             if (string.IsNullOrEmpty(returnUrl))

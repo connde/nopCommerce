@@ -1,4 +1,6 @@
 ﻿@model PluginSearchModel
+
+@inject CommonSettings commonSettings
 @using Nop.Services.Plugins
 
 @{
@@ -21,23 +23,41 @@
         <div class="pull-right">
             @if (Model.NeedToRestart)
             {
-                <button type="submit" name="plugin-apply-changes" class="btn bg-green">@T("Admin.Configuration.Plugins.ApplyChanges")</button>
+                <button type="button" id="plugin-apply-changes" class="btn bg-green">@T("Admin.Configuration.Plugins.ApplyChanges")</button>
                 <button type="submit" name="plugin-discard-changes" class="btn bg-red">@T("Admin.Configuration.Plugins.DiscardChanges")</button>
             }
 
-            <button type="submit" name="plugin-reload-grid" class="btn bg-blue">@T("Admin.Configuration.Plugins.ReloadList")</button>
+            <button type="button" id="plugin-reload" class="btn bg-blue">@T("Admin.Configuration.Plugins.ReloadList")</button>
             <script>
                 $(document).ready(function() {
-                    $("button[name='plugin-reload-grid']").on("click",
-                        function(e) {
-                            showThrobber(
-                                '@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Configuration.Plugins.ReloadList.Progress").Text))');
+                    $("#plugin-reload").click(function() {
+                        showThrobber('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Configuration.Plugins.ReloadList.Progress").Text))');
+                        $.ajax({
+                            type: "GET",
+                            url: "@Url.Action("ReloadList", "Plugin")",
+                            success: function (data) {
+                                if (data.url) {
+                                    window.setTimeout(function () {
+                                        window.location.href = data.url;
+                                    }, @commonSettings.RestartTimeout);
+                                }
+                            }
                         });
-                    $("button[name='plugin-apply-changes']").on("click",
-                        function(e) {
-                            showThrobber(
-                                '@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Configuration.Plugins.ApplyChanges.Progress").Text))');
+                    });
+                    $("#plugin-apply-changes").click(function() {
+                        showThrobber('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Admin.Configuration.Plugins.ApplyChanges.Progress").Text))');
+                        $.ajax({
+                            type: "GET",
+                            url: "@Url.Action("ReloadList", "Plugin")",
+                            success: function (data) {
+                                if (data.url) {
+                                    window.setTimeout(function () {
+                                        window.location.href = data.url;
+                                    }, @commonSettings.RestartTimeout);
+                                }
+                            }
                         });
+                    });
                     $("button[name='plugin-discard-changes']").on("click",
                         function(e) {
                             showThrobber(
@@ -222,7 +242,7 @@
                                 }
                             }
                         })
-                        
+
                         <script>
                             var textRenderer = $.fn.dataTable.render.text().display;
 
@@ -261,7 +281,7 @@
                                     }
                                     else {
                                         canChange = canChange + '<i class="fa fa-close false-icon"></i>';
-                                    };   
+                                    };
                                     canChange = canChange + '</li>';
                                 };
 
@@ -270,7 +290,7 @@
                                     '<li>@T("Admin.Configuration.Plugins.Fields.Author"): ' + row.Author + '</li>' +
                                     '<li>@T("Admin.Configuration.Plugins.Fields.SystemName"): ' + row.SystemName + '</li>' +
                                     '<li>@T("Admin.Configuration.Plugins.Fields.DisplayOrder"): ' + row.DisplayOrder + '</li>' +
-                                    isInstall + 
+                                    isInstall +
                                     canChange;
                             }
 
@@ -374,5 +394,3 @@
         </div>
     </div>
 </div>
-
-
